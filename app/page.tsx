@@ -26,6 +26,42 @@ export default function Home() {
            <ImageDropzone />
         </div>
 
+        {/* ... debajo del Dropzone ... */}
+
+<div className="mt-16 max-w-2xl mx-auto text-left">
+  <h2 className="text-2xl font-bold mb-4">How it works (For Developers)</h2>
+  <p className="text-gray-600 mb-4">
+    This tool is a demonstration of <strong>client-side image compression</strong>. 
+    It uses the <code className="bg-gray-100 p-1 rounded">browser-image-compression</code> library 
+    to process images using WebAssembly directly in your browser, ensuring privacy and speed.
+  </p>
+
+  <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono">
+    <pre>{`import imageCompression from 'browser-image-compression';
+
+async function handleImageUpload(event) {
+  const imageFile = event.target.files[0];
+  
+  const options = {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true
+  };
+
+  try {
+    const compressedFile = await imageCompression(imageFile, options);
+    console.log('Compressed successfully!', compressedFile);
+  } catch (error) {
+    console.log(error);
+  }
+}`}</pre>
+  </div>
+  
+  <p className="mt-4 text-sm text-gray-500">
+    Want to build this? Check the <a href="https://github.com/cramosmartinez/image-converter" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Source Code on GitHub</a>.
+  </p>
+</div>
+
         {/* Footer Minimalista */}
         <div className="pt-10 flex justify-center gap-4 text-sm text-gray-400">
           <span>🔒 100% Seguro</span>
