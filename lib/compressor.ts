@@ -1,24 +1,26 @@
 import imageCompression from 'browser-image-compression';
 
-// Ahora la función acepta calidad y tipo como opcioness
-export async function compressImage(
-  file: File, 
-  quality: number = 0.8, 
-  type: string = 'image/jpeg'
-) {
-  const options = {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1920,
+export interface CompressionOptions {
+  maxSizeMB: number;
+  maxWidthOrHeight: number;
+  quality: number;
+  fileType: string;
+}
+
+export async function compressImage(file: File, options: CompressionOptions) {
+  const config = {
+    maxSizeMB: options.maxSizeMB,
+    maxWidthOrHeight: options.maxWidthOrHeight,
     useWebWorker: true,
-    initialQuality: quality, // Usamos la calidad del slider
-    fileType: type           // Usamos el formato del selector
+    initialQuality: options.quality,
+    fileType: options.fileType,
   };
 
   try {
-    const compressedFile = await imageCompression(file, options);
+    const compressedFile = await imageCompression(file, config);
     return compressedFile;
   } catch (error) {
-    console.error("Error comprimiendo:", error);
+    console.error(`Error compressing ${file.name}:`, error);
     throw error;
   }
 }

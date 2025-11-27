@@ -38,7 +38,12 @@ export default function ImageDropzone() {
     setFileInfo(null);
 
     try {
-      const compressedBlob = await compressImage(file, quality, format);
+      const compressedBlob = await compressImage(file, {
+  maxSizeMB: 1,
+  maxWidthOrHeight: 1920,
+  quality: quality,
+  fileType: format
+});
       
       setFileInfo({
         name: file.name,
