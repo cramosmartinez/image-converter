@@ -1,19 +1,33 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { compressImage } from '@/lib/compressor';
-import { UploadCloud, Download, Loader2, Settings2 } from 'lucide-react';
+import { UploadCloud, Download, Loader2, Settings2, Image as ImageIcon, ArrowRight } from 'lucide-react';
 
 export default function ImageDropzone() {
   const [isCompressing, setIsCompressing] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const [originalSize, setOriginalSize] = useState<string>('');
-  const [newSize, setNewSize] = useState<string>('');
+  const [fileInfo, setFileInfo] = useState<{ name: string; originalSize: number; compressedSize: number } | null>(null);
   
-  // Estados para la configuración (Sin causar bucles infinitos)
+  // Configuración
   const [quality, setQuality] = useState<number>(0.8);
   const [format, setFormat] = useState<string>('image/jpeg');
+
+  // Limpieza de memoria al desmontar
+  useEffect(() => {
+    return () => {
+      if (downloadUrl) URL.revokeObjectURL(downloadUrl);
+    };
+  }, [downloadUrl]);
+
+  const formatBytes = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
 
   const onDrop = async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -21,19 +35,21 @@ export default function ImageDropzone() {
 
     setIsCompressing(true);
     setDownloadUrl(null);
-    setOriginalSize((file.size / 1024 / 1024).toFixed(2) + ' MB');
+    setFileInfo(null);
 
     try {
-      // Pasamos los valores del estado a la función
       const compressedBlob = await compressImage(file, quality, format);
       
-      setNewSize((compressedBlob.size / 1024 / 1024).toFixed(2) + ' MB');
+      setFileInfo({
+        name: file.name,
+        originalSize: file.size,
+        compressedSize: compressedBlob.size
+      });
       
-      // Crear URL de descarga
       const url = URL.createObjectURL(compressedBlob);
       setDownloadUrl(url);
     } catch (error) {
-      alert("Hubo un error comprimiendo la imagen");
+      alert("Error processing image. Please try another file.");
       console.error(error);
     } finally {
       setIsCompressing(false);
@@ -47,91 +63,117 @@ export default function ImageDropzone() {
   });
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
       
-      {/* --- PANEL DE CONTROL --- */}
-      <div className="mb-6 bg-white border border-gray-200 rounded-xl p-4 shadow-sm text-left">
-        <div className="flex items-center gap-2 mb-4 text-gray-700 font-semibold border-b pb-2">
-          <Settings2 className="w-4 h-4" />
-          <span>Configuración</span>
+      {/* --- BARRA DE HERRAMIENTAS --- */}
+      <div className="bg-slate-50/50 border-b border-slate-100 p-4 flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <div className="flex items-center gap-2 text-slate-700 font-semibold text-sm">
+          <Settings2 className="w-4 h-4 text-blue-500" />
+          <span>Settings</span>
         </div>
 
-        {/* Slider de Calidad */}
-        <div className="mb-4">
-          <div className="flex justify-between text-sm mb-1">
-            <label className="font-medium text-gray-600">Calidad</label>
-            <span className="text-blue-600 font-bold">{Math.round(quality * 100)}%</span>
+        <div className="flex gap-4 w-full sm:w-auto">
+          {/* Slider Compacto */}
+          <div className="flex flex-col w-full sm:w-32">
+            <label className="text-[10px] uppercase font-bold text-slate-400 mb-1 flex justify-between">
+              Quality <span>{Math.round(quality * 100)}%</span>
+            </label>
+            <input 
+              type="range" min="0.1" max="1" step="0.1" 
+              value={quality} 
+              onChange={(e) => setQuality(parseFloat(e.target.value))}
+              className="h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+            />
           </div>
-          <input 
-            type="range" 
-            min="0.1" 
-            max="1" 
-            step="0.1" 
-            value={quality} 
-            onChange={(e) => setQuality(parseFloat(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-          />
-        </div>
 
-        {/* Selector de Formato */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">Formato de Salida</label>
+          {/* Selector Compacto */}
           <select 
             value={format} 
             onChange={(e) => setFormat(e.target.value)}
-            className="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+            className="text-xs font-medium p-1.5 bg-white border border-slate-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none text-slate-600"
           >
-            <option value="image/jpeg">JPEG (Mejor compresión)</option>
-            <option value="image/png">PNG (Transparencia)</option>
-            <option value="image/webp">WebP (Moderno)</option>
+            <option value="image/jpeg">JPEG</option>
+            <option value="image/png">PNG</option>
+            <option value="image/webp">WebP</option>
           </select>
         </div>
       </div>
 
-      {/* --- ZONA DE DROP --- */}
-      <div 
-        {...getRootProps()} 
-        className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200
-          ${isDragActive ? 'border-blue-500 bg-blue-50 scale-105' : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'}`}
-      >
-        <input {...getInputProps()} />
-        
-        {isCompressing ? (
-          <div className="flex flex-col items-center gap-2 text-blue-600">
-            <Loader2 className="h-10 w-10 animate-spin" />
-            <p className="font-medium">Procesando...</p>
+      {/* --- ÁREA PRINCIPAL --- */}
+      <div className="p-8">
+        {!downloadUrl ? (
+          <div 
+            {...getRootProps()} 
+            className={`group border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-300 ease-in-out
+              ${isDragActive ? 'border-blue-500 bg-blue-50/50 scale-[1.02]' : 'border-slate-200 hover:border-blue-400 hover:bg-slate-50'}`}
+          >
+            <input {...getInputProps()} />
+            
+            {isCompressing ? (
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-blue-500 blur-lg opacity-20 rounded-full animate-pulse"></div>
+                  <Loader2 className="h-12 w-12 text-blue-600 animate-spin relative z-10" />
+                </div>
+                <p className="font-medium text-slate-600 animate-pulse">Compressing locally...</p>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-4">
+                <div className="p-4 bg-blue-50 text-blue-600 rounded-full group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                  <UploadCloud className="h-8 w-8" />
+                </div>
+                <div>
+                  <p className="font-bold text-lg text-slate-700">Click to upload</p>
+                  <p className="text-slate-400 text-sm mt-1">or drag and drop your image</p>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-2 text-gray-500">
-            <UploadCloud className="h-10 w-10" />
-            {isDragActive ? (
-              <p className="font-medium text-blue-500">¡Suéltala!</p>
-            ) : (
-              <p>Arrastra una imagen o haz clic aquí</p>
-            )}
+          /* --- VISTA DE RESULTADO --- */
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white rounded-lg border border-slate-200 shadow-sm">
+                  <ImageIcon className="w-6 h-6 text-slate-400" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold text-slate-700 truncate max-w-[150px]">{fileInfo?.name}</p>
+                  <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                    <span>{fileInfo && formatBytes(fileInfo.originalSize)}</span>
+                    <ArrowRight className="w-3 h-3" />
+                    <span className="font-bold text-green-600">{fileInfo && formatBytes(fileInfo.compressedSize)}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-right">
+                <span className="block text-xl font-bold text-green-600">
+                  {fileInfo && Math.round(((fileInfo.originalSize - fileInfo.compressedSize) / fileInfo.originalSize) * 100)}%
+                </span>
+                <span className="text-[10px] uppercase font-bold text-green-600/70">Saved</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                onClick={() => { setDownloadUrl(null); setFileInfo(null); }}
+                className="px-4 py-3 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                Compress Another
+              </button>
+              <a 
+                href={downloadUrl} 
+                download={`compressed-codeberry.${format.split('/')[1]}`}
+                className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-95"
+              >
+                <Download className="w-4 h-4" />
+                Download
+              </a>
+            </div>
           </div>
         )}
       </div>
-
-      {/* --- RESULTADOS --- */}
-      {downloadUrl && (
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl text-center animate-in fade-in slide-in-from-bottom-4 shadow-sm">
-          <div className="flex justify-center items-center gap-4 mb-3 text-sm">
-            <div className="text-red-500 line-through decoration-2 opacity-70">{originalSize}</div>
-            <div className="text-gray-400">➜</div>
-            <div className="text-green-700 font-bold text-lg">{newSize}</div>
-          </div>
-          
-          <a 
-            href={downloadUrl} 
-            download={`compressed.${format.split('/')[1]}`} // Extensión dinámica
-            className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg"
-          >
-            <Download className="h-4 w-4" />
-            Descargar Imagen
-          </a>
-        </div>
-      )}
     </div>
   );
 }
