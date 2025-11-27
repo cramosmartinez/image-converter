@@ -1,92 +1,69 @@
-import JsonTool from '@/components/JsonTool';
-import { FileJson, CheckCircle } from 'lucide-react';
-import Link from 'next/link';
+import BatchProcessor from '@/components/batch-processor';
+import { ShieldCheck, Zap, Lock, Terminal, Cpu } from 'lucide-react';
 
-// Definición del Schema Markup para SEO
-const jsonSchema = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "CodeBerry JSON Formatter & CSV Converter",
-  "operatingSystem": "Web Browser",
-  "applicationCategory": "DeveloperTool",
-  "description": "Free online tool to format, minify, and convert JSON to CSV, running entirely client-side for privacy and speed.",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8", 
-    "reviewCount": "50" 
-  }
-};
-
-export default function JsonPage() {
+export default function Home() {
   return (
-    <main className="min-h-screen bg-[#F7F7F7] pt-24 pb-20">
+    <main className="min-h-screen bg-[#FAFAFA] pb-32">
       
-      {/* ⚠️ INYECCIÓN DEL SCHEMA (SEO TÉCNICO) ⚠️ */}
-      {/* Esto le dice a Google que esta página es una aplicación de software */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonSchema) }}
-      />
-      
-      <div className="text-center max-w-4xl mx-auto px-4">
-        
-        {/* Encabezado SEO */}
-        <div className="flex justify-center items-center gap-2 mb-2">
-            <div className="bg-blue-600 p-1.5 rounded-full">
-              <FileJson className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">CodeBerry JSON Utility</span>
+      {/* HEADER */}
+      <section className="pt-20 pb-16 px-6 text-center">
+        <div className="inline-flex items-center gap-2 bg-slate-900 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-6">
+          <Cpu className="w-3 h-3" /> v2.0 Batch Processor
         </div>
-
-        {/* Título Optimizado para SEO (H1) */}
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-4">
-          Free Online JSON Formatter, Minifier & CSV Converter
+        <h1 className="text-5xl md:text-7xl font-black tracking-tight text-slate-900 mb-6">
+          CodeBerry <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Pro</span>
         </h1>
-        
-        <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-10">
-          Fast, client-side tools for JSON validation and conversion. No data leaves your browser.
-        </p>
-
-      </div>
-
-      {/* La Herramienta Principal */}
-      <JsonTool />
-
-      {/* Footer Técnico / SEO Content */}
-      <div className="max-w-6xl mx-auto px-4 mt-20 border-t pt-10">
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">Why Use a Client-Side JSON Tool?</h2>
-        <p className="text-slate-600 mb-4">
-          As developers, <strong>privacy and speed</strong> are paramount. Unlike many online tools, CodeBerry's JSON processing happens entirely on your local machine using JavaScript. This avoids network latency and ensures sensitive data remains secure.
+        <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
+          The most powerful <strong>client-side</strong> image compressor. <br/>
+          Batch processing, ZIP support, and visual comparison.
         </p>
         
-        <div className="grid md:grid-cols-2 gap-8 mt-8">
-            <div className="flex items-start gap-4">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
-                <div>
-                    <h3 className="font-bold text-slate-800">For Developers: Minification</h3>
-                    <p className="text-sm text-slate-600">Minify JSON API responses before shipping them to production environments to save bandwidth.</p>
-                </div>
-            </div>
-            <div className="flex items-start gap-4">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
-                <div>
-                    <h3 className="font-bold text-slate-800">For Data Analysts: CSV Conversion</h3>
-                    <p className="text-sm text-slate-600">Easily transform complex JSON arrays into standard CSV format for spreadsheets and database import.</p>
-                </div>
-            </div>
+        {/* Badges para JS.ORG */}
+        <div className="flex justify-center gap-3 opacity-80 mb-10">
+          <a href="https://github.com/cramosmartinez/image-converter" target="_blank" rel="noopener noreferrer">
+            <img src="https://img.shields.io/github/stars/cramosmartinez/image-converter?style=social" alt="Stars" />
+          </a>
+          <img src="https://img.shields.io/badge/Privacy-100%25-green" alt="Privacy" />
         </div>
-        
-        <div className="mt-10 text-center">
-            <Link href="/" className="text-blue-600 hover:text-blue-800 font-semibold underline">
-                ← Go back to the Image Compressor
-            </Link>
+      </section>
+
+      {/* APP CORE */}
+      <section className="px-4 md:px-6">
+        <BatchProcessor />
+      </section>
+
+      {/* DEVELOPER DOCS (JS.ORG COMPLIANCE) */}
+      <section id="how-it-works" className="max-w-4xl mx-auto mt-32 border-t pt-16 px-6">
+        <div className="flex items-center gap-3 mb-6">
+          <Terminal className="w-6 h-6 text-slate-900" />
+          <h2 className="text-3xl font-bold">Developer Implementation</h2>
         </div>
-      </div>
+        <p className="text-slate-600 mb-6 text-lg leading-relaxed">
+          This project pushes the limits of client-side processing. It uses <strong>WebAssembly</strong> for multi-threaded compression and **JSZip** for on-the-fly ZIP generation.
+        </p>
+        <div className="bg-slate-900 text-slate-300 p-6 rounded-xl border border-slate-800 font-mono text-sm overflow-x-auto">
+          <pre>{`// Example: Client-Side Batch Processing
+import imageCompression from 'browser-image-compression';
+import JSZip from 'jszip';
+
+async function batchProcess(files) {
+  const zip = new JSZip();
+  
+  // Process in parallel
+  await Promise.all(files.map(async (file) => {
+    // ... compression logic ...
+    zip.file(file.name, compressed);
+  }));
+  
+  return await zip.generateAsync({ type: 'blob' });
+}`}</pre>
+        </div>
+        <div className="mt-4 text-center">
+           <a href="https://github.com/cramosmartinez/image-converter" target="_blank" className="text-blue-600 hover:underline font-bold">View Source Code on GitHub →</a>
+        </div>
+      </section>
+
+      {/* FOOTER - NOT USED, AS NAVBAR HAS LINKS */}
     </main>
   );
 }
