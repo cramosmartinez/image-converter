@@ -2,7 +2,8 @@
 
 CodeBerry is an open-source, privacy-focused image compression tool built with **Next.js** and **WebAssembly**.
 
-## 🚀 Features
+
+## 🚀 Features 
 
 - **100% Client-Side:** No images are uploaded to any server. Everything happens in the browser.
 - **WebAssembly Power:** Uses `browser-image-compression` for efficient processing.
