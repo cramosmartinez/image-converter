@@ -1,6 +1,6 @@
 import imageCompression from 'browser-image-compression';
 
-// Ahora la función acepta calidad y tipo como opciones
+// Ahora la función acepta calidad y tipo como opcioness
 export async function compressImage(
   file: File, 
   quality: number = 0.8, 
