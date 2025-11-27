@@ -1,5 +1,5 @@
 import ImageDropzone from '@/components/image-dropzone';
-import { ShieldCheck, Zap, Lock } from 'lucide-react';
+import { ShieldCheck, Zap, Lock, Terminal } from 'lucide-react'; // <--- ¡Agregué Terminal aquí!
 
 export default function Home() {
   return (
