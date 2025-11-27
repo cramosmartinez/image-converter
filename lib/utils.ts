@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+// Función que combina clsx (para lógica condicional) y twMerge (para sobrescribir estilos Tailwind)
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

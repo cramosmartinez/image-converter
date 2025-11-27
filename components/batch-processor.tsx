@@ -8,6 +8,7 @@ import { saveAs } from 'file-saver';
 import { compressImage } from '@/lib/compressor';
 import { formatBytes } from '@/lib/utils';
 import ComparisonSlider from './comparison';
+import Dropdown from './ui/dropdown'; // <-- ¡IMPORTANTE! Nuevo componente
 import { UploadCloud, FileArchive, X, CheckCircle2, Loader2, Settings, Download } from 'lucide-react';
 
 export default function BatchProcessor() {
@@ -20,6 +21,13 @@ export default function BatchProcessor() {
   const [quality, setQuality] = useState(0.8);
   const [format, setFormat] = useState('image/jpeg');
   const [resize, setResize] = useState(1920);
+
+  // Opciones para el Dropdown
+  const formatOptions = [
+    { label: 'JPEG (Mejor Comp.)', value: 'image/jpeg' },
+    { label: 'PNG (Transparencia)', value: 'image/png' },
+    { label: 'WebP (Moderno)', value: 'image/webp' },
+  ];
 
   // Manejador de subida
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -106,13 +114,17 @@ export default function BatchProcessor() {
               <span className="text-sm font-mono">{Math.round(quality * 100)}%</span>
             </div>
           </div>
+          
+          {/* AQUÍ ESTÁ EL NUEVO DROPDOWN */}
           <div className="w-40">
             <label className="text-xs font-bold text-slate-500 uppercase">Format</label>
-            <select value={format} onChange={e => setFormat(e.target.value)} className="w-full mt-1 p-1.5 border rounded text-sm bg-slate-50">
-              <option value="image/jpeg">JPEG</option>
-              <option value="image/png">PNG</option>
-              <option value="image/webp">WebP</option>
-            </select>
+            <Dropdown
+              options={formatOptions}
+              value={format}
+              onChange={setFormat}
+              className="mt-1"
+              placeholder="Select format"
+            />
           </div>
         </div>
         
