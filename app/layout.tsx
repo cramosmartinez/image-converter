@@ -6,9 +6,10 @@ import Navbar from "@/components/navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CodeBerry | Client-Side Image Compressor",
-  description: "Secure, fast, and private image compression running 100% in your browser using WebAssembly. No servers involved.",
-  keywords: ["image compression", "webassembly", "nextjs", "privacy", "client-side", "batch processing"],
+  // ... Tu metadata SEO actual ...
+  title: "CodeBerry | Client-Side Image Compressor & JSON Tool",
+  description: "Secure, fast, and private image and JSON processing running 100% in your browser. Works offline (PWA).",
+  keywords: ["image compression", "json formatter", "pwa", "offline", "client-side", "batch processing"],
 };
 
 export default function RootLayout({
@@ -18,6 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        {/* 🚀 ENLACE AL MANIFIESTO PWA (NUEVA LÍNEA CRÍTICA) */}
+        <link rel="manifest" href="/manifest.json" />
+        {/* Otros enlaces (como favicon) van aquí */}
+      </head>
       <body className={inter.className}>
         <Navbar />
         <div className="pt-16">
